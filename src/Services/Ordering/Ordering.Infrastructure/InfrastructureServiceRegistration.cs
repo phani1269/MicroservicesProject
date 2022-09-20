@@ -13,7 +13,7 @@ namespace Ordering.Infrastructure
 {
     public static class InfrastructureServiceRegistration
     {
-        public  static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
 
 
@@ -26,7 +26,7 @@ namespace Ordering.Infrastructure
             services.Configure<EmailSettings>(c => configuration.GetSection("EmailSettings"));
             services.AddTransient<IEmailService, EmailService>();
             return services;
-            
+
         }
 
     }
