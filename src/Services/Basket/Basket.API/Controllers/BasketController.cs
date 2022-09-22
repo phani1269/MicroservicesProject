@@ -71,10 +71,6 @@ namespace Basket.API.Controllers
                 return BadRequest();
             }
 
-
-
-
-
             var eventmessage = _mapper.Map<BasketCheckoutEvent>(basketCheckout);
             eventmessage.TotalPrice = basket.TotalPrice;
             await _publishEndpoint.Publish(eventmessage);
