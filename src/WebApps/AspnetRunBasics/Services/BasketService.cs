@@ -1,5 +1,6 @@
 ﻿using AspnetRunBasics.Extensions;
 using AspnetRunBasics.Models;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace AspnetRunBasics.Services
 
         public BasketService(HttpClient client)
         {
-            _client = client ?? throw new ArgumentNullException(nameof(client));
+            _client = client;
         }
 
         public async Task<BasketModel> GetBasket(string userName)
@@ -41,6 +42,7 @@ namespace AspnetRunBasics.Services
             {
                 throw new Exception("Something went wrong when calling api.");
             }
+            
         }
     }
 }

@@ -14,20 +14,36 @@ namespace Catalog.API.Controllers
     [Route("api/v1/[controller]")]
     public class CatalogController:ControllerBase   
     {
+        private readonly ICacheService _cacheService;
         private readonly IProductRepository _repository;
         private readonly ILogger<CatalogController> _logger;
 
-        public CatalogController(IProductRepository repository, ILogger<CatalogController> logger)
+        public CatalogController(ICacheService cacheService, IProductRepository repository, ILogger<CatalogController> logger)
         {
+            _cacheService = cacheService;
             _repository = repository;
             _logger = logger;
         }
+
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<Product>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            var products = await _repository.GetProducts();
-            return Ok(products);
+            // check cache data
+            var cacheData = _cacheService.GetData<IEnumerable<Product>>("Products");
+            if (cacheData != null && cacheData.Count() > 0)
+            {
+                _logger.LogInformation("Data is fetched from cahce data");
+                return Ok(cacheData);
+            }
+
+            cacheData = await _repository.GetProducts();
+
+            //Set ExpiryTime
+            var expiryTime = DateTimeOffset.Now.AddMinutes(5);
+            _cacheService.SetData<IEnumerable<Product>>("Products", cacheData, expiryTime);
+            _logger.LogInformation("Data is fetched from catalog database ");
+            return Ok(cacheData);
         }
 
         [HttpGet("{id:length(24)}", Name = "GetProduct")]

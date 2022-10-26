@@ -15,6 +15,7 @@ services:
     ports:
       - "6379:6379"
 
+
   discountdb:
     container_name: discountdb
     environment:
@@ -72,9 +73,12 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - "DatabaseSettings:ConnectionString=mongodb://catalogdb:27017"
+      - "RedisCache:Host=basketdb"
+      -  CacheSettings_ConnectionString=basketdb:6379,abortConnect=False,syncTimeout=10000,connectTimeout=1000
       - "ElasticConfiguration:Uri=http://elasticsearch:9200"
     depends_on:
       - catalogdb
+      - basketdb
     ports:
       - "8000:80"
 

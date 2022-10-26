@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +29,35 @@ namespace Catalog.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var deltaBackOffms = Convert.ToInt32(TimeSpan.FromSeconds(5).TotalMilliseconds);
+            var maxdeltaBackOffms = Convert.ToInt32(TimeSpan.FromSeconds(20).TotalMilliseconds);
 
+
+            var options = new ConfigurationOptions
+            {
+
+                EndPoints = { $"{Configuration.GetValue<string>("RedisCache:Host")}:{Configuration.GetValue<int>("RedisCache:Port")}" },
+                ConnectRetry = 5,
+                ReconnectRetryPolicy = new ExponentialRetry(deltaBackOffms,
+                                                maxdeltaBackOffms),
+                ConnectTimeout = 1000,
+                AbortOnConnectFail = false,
+                SyncTimeout = 10000
+            };
+
+            var redisMultiplexer = ConnectionMultiplexer.Connect(options);
+
+            services.AddSingleton<IConnectionMultiplexer>(redisMultiplexer);
+
+            /*services.AddSingleton<IConnectionMultiplexer>(opt =>
+                   ConnectionMultiplexer.Connect(Configuration.GetValue<string>("CacheSettings:ConnectionString")));*/
+
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = Configuration.GetValue<string>("CacheSettings:ConnectionString");
+            });
+
+            services.AddScoped<ICacheService, CacheService>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
