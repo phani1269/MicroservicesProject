@@ -2,9 +2,7 @@
 using Catalog.API.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -29,21 +27,27 @@ namespace Catalog.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<Product>), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            // check cache data
-            var cacheData = _cacheService.GetData<IEnumerable<Product>>("Products");
-            if (cacheData != null && cacheData.Count() > 0)
+            var cacheData = GetCacheData<IEnumerable<Product>>("Products");
+
+            if (cacheData == null)
             {
-                _logger.LogInformation("Data is fetched from cahce data");
+                var data = await _repository.GetProducts();
+                _cacheService.SetData<IEnumerable<Product>>("Products", data, 1);
+                return Ok(data);
+            }
+            else
+            {
+                return cacheData;
+            }
+        }
+        private ActionResult<T> GetCacheData<T>(string key)
+        {
+            var cacheData = _cacheService.GetData<T>(key);
+            if (cacheData != null)
+            {
                 return Ok(cacheData);
             }
-
-            cacheData = await _repository.GetProducts();
-
-            //Set ExpiryTime
-            var expiryTime = DateTimeOffset.Now.AddMinutes(5);
-            _cacheService.SetData<IEnumerable<Product>>("Products", cacheData, expiryTime);
-            _logger.LogInformation("Data is fetched from catalog database ");
-            return Ok(cacheData);
+            return default;
         }
 
         [HttpGet("{id:length(24)}", Name = "GetProduct")]
@@ -51,6 +55,7 @@ namespace Catalog.API.Controllers
         [ProducesResponseType(typeof(Product), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<Product>> GetProductById(string id)
         {
+
             var product = await _repository.GetProduct(id);
             if (product == null)
             {
@@ -91,5 +96,7 @@ namespace Catalog.API.Controllers
         {
             return Ok(await _repository.DeleteProduct(id));
         }
+
+        
     }
 }

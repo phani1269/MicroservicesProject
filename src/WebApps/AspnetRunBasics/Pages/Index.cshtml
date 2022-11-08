@@ -1,8 +1,7 @@
-﻿@page
+﻿
+@page
 @model IndexModel
-@{
-    ViewData["Title"] = "Home page";
-}
+@{ ViewData["Title"] = "Home page"; }
 
 <hr />
 
@@ -15,6 +14,7 @@
                     <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
                     <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
                 </ol>
+
                 <div class="carousel-inner">
                     <div class="carousel-item active">
                         <img class="d-block w-100" src="~/images/banner/banner1.png" alt="First slide">
@@ -32,7 +32,7 @@
             </div>
         </div>
 
-        <partial name="_TopProductPartial" model="Model.ProductList.FirstOrDefault()" />       
+        <partial name="_TopProductPartial" model="Model.ProductList.FirstOrDefault()" />
 
     </div>
 </div>
@@ -49,10 +49,9 @@
 
                         @foreach (var product in Model.ProductList.Take(4))
                         {
-                            <div class="col-sm">
-                                <partial name="_ProductItemPartial" model="@product" />
-                            </div>
-                        }
+            <div class="col-sm">
+                <partial name="_ProductItemPartial" model="@product" />
+            </div>}
 
                     </div>
                 </div>
@@ -70,14 +69,13 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        
-                            @foreach (var product in Model.ProductList.TakeLast(4))
-                            {
-                                <div class="col-sm">
-                                    <partial name="_ProductItemPartial" model="@product" />
-                                </div>
-                            }
-                        
+
+                        @foreach (var product in Model.ProductList.TakeLast(4))
+                        {
+            <div class="col-sm">
+                <partial name="_ProductItemPartial" model="@product" />
+            </div>}
+
                     </div>
                 </div>
             </div>

@@ -1,9 +1,6 @@
 ﻿using StackExchange.Redis;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Catalog.API.Repositories
 {
@@ -13,44 +10,39 @@ namespace Catalog.API.Repositories
 
         public CacheService(IConnectionMultiplexer connectionMultiplexer)
         {
-
             _connectionMultiplexer = connectionMultiplexer;
-
         }
-
 
         public T GetData<T>(string key)
         {
-            var _db = _connectionMultiplexer.GetDatabase(2);
+            var _db = _connectionMultiplexer.GetDatabase(1);
             var value = _db.StringGet(key);
             if (!string.IsNullOrEmpty(value))
             {
                 return JsonSerializer.Deserialize<T>(value);
             }
             return default;
-
-           
         }
 
         public object RemoveData(string key)
         {
-            var _db = _connectionMultiplexer.GetDatabase(2);
+            var _db = _connectionMultiplexer.GetDatabase(1);
             var value = _db.KeyExists(key);
             if (value)
             {
                 return _db.KeyDelete(key);
             }
             return false;
-
         }
 
-        public bool SetData<T>(string key, T value, DateTimeOffset expirationTime)
+        public bool SetData<T>(string key, T value, int Time)
         {
-            var _db = _connectionMultiplexer.GetDatabase(2);
-            var expiryTime = expirationTime.DateTime.Subtract(DateTime.Now);
+            var db = _connectionMultiplexer.GetDatabase(1);
             var serial = JsonSerializer.Serialize(value);
-            var isSet = _db.StringSet(key, serial, expiryTime);
-            return isSet;
+            var expiryTime = DateTimeOffset.Now.AddMinutes(Time);
+            var expiry = expiryTime.DateTime.Subtract(DateTime.Now);
+            var set = db.StringSet(key, serial, expiry);
+            return set;
         }
     }
 }

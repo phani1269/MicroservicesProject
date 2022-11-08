@@ -37,6 +37,18 @@ services:
     restart: always
     ports:
         - "1433:1433"
+
+  identitydb:
+    container_name: identitydb
+    environment:
+        MSSQL_SA_PASSWORD: "SwN12345678"
+        ACCEPT_EULA: "Y"
+        
+    restart: always
+    ports:
+        - "1434:1433"
+    volumes:
+      - sqlVolume1:/var/opt/mssql/data
  
   rabbitmq:
     container_name: rabbitmq
@@ -177,7 +189,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - "ApiSettings:GatewayAddress= http://ocelotapigw"
       - "ElasticConfiguration:Uri=http://elasticsearch:9200"
-
+      - "ConnectionStrings:AspnetRunBasicsContextConnection= Server=identitydb;Database=AapnetBasicsIdentityDb; User Id= SA ;Password= SwN12345678"
     depends_on:
       - ocelotapigw
       - catalog.api

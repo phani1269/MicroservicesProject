@@ -1,19 +1,13 @@
 using Catalog.API.Data;
 using Catalog.API.Repositories;
-using Common.Logging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Catalog.API
 {
@@ -32,7 +26,6 @@ namespace Catalog.API
             var deltaBackOffms = Convert.ToInt32(TimeSpan.FromSeconds(5).TotalMilliseconds);
             var maxdeltaBackOffms = Convert.ToInt32(TimeSpan.FromSeconds(20).TotalMilliseconds);
 
-
             var options = new ConfigurationOptions
             {
 
@@ -48,16 +41,17 @@ namespace Catalog.API
             var redisMultiplexer = ConnectionMultiplexer.Connect(options);
 
             services.AddSingleton<IConnectionMultiplexer>(redisMultiplexer);
+            services.AddScoped<ICacheService, CacheService>();
 
-            /*services.AddSingleton<IConnectionMultiplexer>(opt =>
-                   ConnectionMultiplexer.Connect(Configuration.GetValue<string>("CacheSettings:ConnectionString")));*/
-
+            
+            
+            
             services.AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = Configuration.GetValue<string>("CacheSettings:ConnectionString");
             });
 
-            services.AddScoped<ICacheService, CacheService>();
+           
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AspnetRunBasics.Areas.Identity.Data;
 using AspnetRunBasics.Models;
 using AspnetRunBasics.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -13,11 +15,14 @@ namespace AspnetRunBasics
     {
         private readonly ICatalogService _catalogService;
         private readonly IBasketService _basketService;
+        private readonly UserManager<AspnetRunBasicsUser> _userManager;
 
-        public ProductModel(ICatalogService catalogService, IBasketService basketService)
+        public ProductModel(ICatalogService catalogService, IBasketService basketService
+            , UserManager<AspnetRunBasicsUser> userManager)
         {
-            _catalogService = catalogService ?? throw new ArgumentNullException(nameof(catalogService));
-            _basketService = basketService ?? throw new ArgumentNullException(nameof(basketService));
+            _catalogService = catalogService;
+            _basketService = basketService;
+            _userManager = userManager;
         }
 
         public IEnumerable<string> CategoryList { get; set; } = new List<string>();
@@ -49,8 +54,14 @@ namespace AspnetRunBasics
         {
             var product = await _catalogService.GetCatalog(productId);
 
-            var userName = "swn";
-            var basket = await _basketService.GetBasket(userName);
+            // var userName = "swn";
+
+            if (!User.Identity.IsAuthenticated)
+                return RedirectToPage("./Account/Login", new { area = "Identity" });
+
+            var userName = await _userManager.GetUserAsync(HttpContext.User);
+
+            var basket = await _basketService.GetBasket(userName.UserName);
 
             basket.Items.Add(new BasketItemModel
             {

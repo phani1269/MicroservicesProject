@@ -1,6 +1,10 @@
+using AspnetRunBasics.Data;
+using AspnetRunBasics.Extensions;
 using Common.Logging;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Sinks.Elasticsearch;
 using System;
@@ -12,7 +16,12 @@ namespace AspnetRunBasics
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            CreateHostBuilder(args).Build()
+                .MigrateDatabase<AspnetRunBasicsContext>((context, services) =>
+            {
+                var logger = services.GetService<ILogger<AspnetRunBasicsContext>>();
+
+            }).Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
