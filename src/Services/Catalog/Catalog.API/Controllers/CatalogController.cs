@@ -1,16 +1,13 @@
 ﻿using Catalog.API.Entities;
 using Catalog.API.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace Catalog.API.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class CatalogController:ControllerBase   
+    public class CatalogController : ControllerBase
     {
         private readonly ICacheService _cacheService;
         private readonly IProductRepository _repository;
@@ -97,6 +94,6 @@ namespace Catalog.API.Controllers
             return Ok(await _repository.DeleteProduct(id));
         }
 
-        
+
     }
 }
