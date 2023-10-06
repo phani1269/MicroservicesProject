@@ -1,5 +1,6 @@
 ﻿using Catalog.API.Entities;
 using Catalog.API.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -7,6 +8,7 @@ namespace Catalog.API.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
+    //[Authorize]
     public class CatalogController : ControllerBase
     {
         private readonly ICacheService _cacheService;
@@ -29,7 +31,7 @@ namespace Catalog.API.Controllers
             if (cacheData == null)
             {
                 var data = await _repository.GetProducts();
-                _cacheService.SetData<IEnumerable<Product>>("Products", data, 1);
+                _cacheService.SetData<IEnumerable<Product>>("Products", data);
                 return Ok(data);
             }
             else

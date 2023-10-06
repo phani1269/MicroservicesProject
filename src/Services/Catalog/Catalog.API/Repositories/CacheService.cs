@@ -35,13 +35,13 @@ namespace Catalog.API.Repositories
             return false;
         }
 
-        public bool SetData<T>(string key, T value, int Time)
+        public bool SetData<T>(string key, T value)
         {
             var db = _connectionMultiplexer.GetDatabase(1);
             var serial = JsonSerializer.Serialize(value);
-            var expiryTime = DateTimeOffset.Now.AddMinutes(Time);
-            var expiry = expiryTime.DateTime.Subtract(DateTime.Now);
-            var set = db.StringSet(key, serial, expiry);
+            //var expiryTime = DateTimeOffset.Now.AddMinutes(Time);
+            //var expiry = expiryTime.DateTime.Subtract(DateTime.Now);
+            var set = db.StringSet(key, serial);
             return set;
         }
     }

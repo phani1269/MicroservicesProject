@@ -10,14 +10,21 @@ namespace IdentityServer
             {
                 new Client()
                 {
-                    ClientId ="";
+                    ClientId ="catalogClient",
+                    AllowedGrantTypes = GrantTypes.ClientCredentials,
+                    ClientSecrets =
+                    {
+                        new Secret("secret".Sha256())
+                    },
+                    AllowedScopes={"catalogAPI"}
+
                 }
             };
 
         public static IEnumerable<ApiScope> ApiScopes => 
             new ApiScope[]
            { 
-               new ApiScope("","")
+               new ApiScope("catalogAPI","Catalog API")
            };
 
         public static IEnumerable<ApiResource> ApiResources =>

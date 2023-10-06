@@ -1,13 +1,7 @@
 using Catalog.API.Data;
 using Catalog.API.Repositories;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
-using System;
 
 namespace Catalog.API
 {
@@ -43,15 +37,21 @@ namespace Catalog.API
             services.AddSingleton<IConnectionMultiplexer>(redisMultiplexer);
             services.AddScoped<ICacheService, CacheService>();
 
-            
-            
-            
             services.AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = Configuration.GetValue<string>("CacheSettings:ConnectionString");
             });
 
-           
+            //services.AddAuthentication("Bearer").AddJwtBearer("Bearer", options =>
+            //{
+            //    options.RequireHttpsMetadata = false;
+            //    options.Authority = "http://localhost:5070";
+            //    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+            //    {
+            //        ValidateAudience = false
+            //    };
+            //});
+
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -60,7 +60,7 @@ namespace Catalog.API
             });
 
             services.AddScoped<ICatalogContext, CatalogContext>();
-            services.AddScoped<IProductRepository , ProductRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -74,6 +74,10 @@ namespace Catalog.API
             }
 
             app.UseRouting();
+
+            app.UseHttpsRedirection();
+
+            //app.UseAuthentication();
 
             app.UseAuthorization();
 

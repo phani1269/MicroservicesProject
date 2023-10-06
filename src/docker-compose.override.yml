@@ -1,5 +1,5 @@
 version: '3.4'
-
+name: ecommerce-project
 services:
   catalogdb:
     container_name: catalogdb
@@ -59,26 +59,26 @@ services:
   
     
 
-  pgadmin:
-    container_name: pgadmin
-    environment:
-        - PGADMIN_DEFAULT_EMAIL=admin@phani.com
-        - PGADMIN_DEFAULT_PASSWORD=admin1234
-    restart: always
-    ports:
-          - "5050:80"
-    volumes:
-        - pgadmin_data:/root/.pgadmin
+  #pgadmin:
+  #  container_name: pgadmin
+  #  environment:
+  #      - PGADMIN_DEFAULT_EMAIL=admin@phani.com
+  #      - PGADMIN_DEFAULT_PASSWORD=admin1234
+  #  restart: always
+  #  ports:
+  #        - "5050:80"
+  #  volumes:
+  #      - pgadmin_data:/root/.pgadmin
         
-  portainer:
-    container_name: portainer
-    restart: always
-    ports:
-      - "8080:8000"
-      - "9000:9000"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
+  #portainer:
+  #  container_name: portainer
+  #  restart: always
+  #  ports:
+  #    - "8080:8000"
+  #    - "9000:9000"
+  #  volumes:
+  #    - /var/run/docker.sock:/var/run/docker.sock
+  #    - portainer_data:/data
      
   catalog.api:
     container_name: catalog.api
